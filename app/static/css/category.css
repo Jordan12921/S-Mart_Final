@@ -1,0 +1,28 @@
+.category-list {
+    max-height: 200px; /* Set the maximum height for scroll */
+    overflow-y: auto; /* Enable vertical scroll if needed */
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+  }
+
+  .category-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .category-item:hover {
+    background-color: #f2f2f2;
+  }
+
+  .category-input {
+    margin-right: 10px;
+  }
+
+  .category-item,input[type="radio"]:checked{
+    /* background-color: var(); */
+  }

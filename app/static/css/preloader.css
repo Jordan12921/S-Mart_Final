@@ -1,0 +1,15 @@
+:root {
+    --background-url: {{ url_for('static', filename='/img/gear-loader.gif') }}
+}
+
+#preloader{
+    background:var(--bg-color-dark) url("/static/img/gear-loader.gif") no-repeat center center;
+    background-size: 100px;
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: opacity .2s linear;
+}

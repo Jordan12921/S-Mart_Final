@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block nav_title %} Staff Overview {% endblock %}
+
+{% block css_style %} 
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/modal.css')}}"> 
+
+{% endblock %}
+{% block nav_staff %}active{% endblock %}
+{% block content %}
+
+
+{% if form %}
+{% for field, errors in form.errors.items() %}
+    <ul class="errors">
+        {% for error in errors %}
+        <li>{{field}}: {{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+{% endif %}
+
+<a href="{{url_for('main.role_management')}}"><b style="text-decoration: underline;">Role Management</b></a><br><br>
+<div class="flex flex-between-center">
+    <a href="{{url_for('user.create_staff')}}" class="button success">Create</a>
+    <form action="{{url_for('user.search_staff')}}" method="get" class="flex flex-start-center">
+        <input type="text" name="search" style="display: inline-block; margin: 0 10px 0 0;" placeholder="Search Field" required>
+        <button type="submit" class="button primary">Search</button>
+    </form>
+</div>
+<div class="table-container maxheight-800 scrollable">
+    <table >
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Last Login</th>
+                {% for role in current_user.roles if role.name == 'admin' %}<th>Action</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff in staffs if not staff == current_user %}
+            <tr>
+                
+                  
+                <td>
+                    <span><a href="{{url_for('user.get_staff',id = staff.id)}}">{{ staff.id}}</a></span>
+
+                </td>      
+                <td>
+                    <span><a href="{{url_for('user.get_staff',id = staff.id)}}">{{ staff.First_Name + ' ' + staff.Last_Name}}</a></span>
+
+                </td>      
+                <td>
+                    <span>{{ staff.Email}}</span>
+    
+                </td>      
+    
+                <td>
+                    <!-- <span>{{ staff.Role}}</span> -->
+                    {% for role in staff.roles %}
+                    {{role.name}}
+                    {% endfor %}
+                </td>   
+                <td>
+                    {{ staff.Last_Login}}
+                </td> 
+
+                {% for role in current_user.roles if role.name == 'admin' %}
+                <td>
+                    <!-- <button type="button" class="button info" id="edit" href="javascript:;"><i class='bx bx-edit'></i></button>
+                    <button type="submit" class="button info" id="update" style="display: none;"><i class='bx bx-check'></i></button>
+                    <button type="button" class="button gray" id="cancel" href="javascript:;" style="display: none;"><i class='bx bx-x'></i></button>
+                     -->
+                <!-- </form> -->
+                
+                <form method="POST" action="{{ url_for('user.delete_staff', id=staff.id) }}" style="display: inline-block;">
+                    <button id="delete" type="submit" class="button error" onclick="return confirm('Are you sure you want to delete this item?')"><i class='bx bx-trash-alt'></i></button>
+                </form>
+                </td>   
+                {% endfor %} 
+               
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+{% endblock %}
+
+{% block jscontent %}
+<script src="{{url_for('static',filename='/js/tablefield_editable.js')}}"></script>
+{% endblock %}

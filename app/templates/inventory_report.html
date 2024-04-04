@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block nav_ImExport %}active{% endblock %}
+{% block css_style %}
+
+{% endblock %}
+{% block content %}
+<h3>Generate by StockIn Date</h3>
+<br>
+<form action="{{url_for("main.generate_inventory_report")}}" method="get">
+    <label for="product">Product: </label>
+    <select name="product" id="">
+        {% for product in products %}
+        <option value="{{product.Name}}">{{product.Name}}</option>
+        {% endfor %}
+    </select>
+
+    <label for="fromdate">From Date:</label>
+    <input type="date" name="from_date" required>
+
+    <label for="todate">To Date:</label>
+    <input type="date" name="to_date" required>
+
+    
+    <input type="submit" value="Generate Report">
+</form>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block nav_title %} Sales Overview {% endblock %}
+{% block css_style %} 
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/modal.css')}}"> 
+
+{% endblock %}
+{% block nav_report %}active{% endblock %}
+{% block content %}
+
+    <div class="grid-container two-grid">
+        <div class="">
+            Amount Sales Today
+            <div class="table-container maxheight full_width scrollable">
+
+                <table class="scrollable">
+                    <thead>
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>Name</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       {% for record in staff_totals %}
+                       <tr>
+
+                           <td>{{record.Staff_id}}</td>
+                           <td>{{record.Name}}</td>
+                           <td>{{"%.2f"|format(record.Total_Amount)}}</td>
+                        </tr>
+                       {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="">
+            Product Sales Today
+           
+                <div class="table-container maxheight scrollable full_width" style="max-height: 220px; overflow-y: scroll;">
+
+                <table class="">
+                    <thead>
+                        <tr>
+                           <th>Product</th>
+                           <th>Quantity</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{product.Name}}</td>
+                                <td>{{ product.Quantity }}</td>
+                                
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="table-container scrollable">
+        <h3>Sales Report</h3>
+        <form action="{{url_for('sale.search_sales')}}" method="GET">
+            <div class="flex flex-between-center">
+
+                <div class="flex flex-start-center">
+                    <div class="" style="margin: 0 10px 0 0;">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" required>
+                    </div>
+                    <button type="submit" class="button info" style="margin: 10px 0 0 10px;">Search</button>
+                </div>
+                <div class="">
+                    <p style="font-size: 1.5rem;">
+                        Total Sales: RM {% if total_sales %}{{"%.2f"|format(total_sales)}}{% else %} 0 {% endif %}
+                    </p>
+                </div>
+            </div>
+        </form>
+        <br><br>
+        <div class="" style="max-height: 240px; overflow-y: scroll;">
+            <table>
+                <tr> 
+                    <th>No</th>
+                    <th>Date</th>
+                    
+                    <th>Discount (%)</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for sale in sales %}
+                <tr> 
+                    <td>{{loop.index}}</td>
+                    <td>{{sale.Date}}</td>
+                    <td>{{sale.Discount}}</td>
+                    <td>{{sale.Type_Payment}}</td>
+                    <td>{{"%.2f"|format(sale.Total)}}</td>
+                    <td>{{sale.Status}}</td>
+                    {% if sale.Status == "draft" %}
+                    <td><a href="{{url_for('sale.show_checkout_page')}}">Edit</a></td>
+                    {% else %}
+                    <td>
+                        <a href="{{url_for('sale.get_sale_detail',date = sale.Date)}}">view</a>
+                        {% for role in current_user.roles if role.name == 'admin' %}{% endfor %}
+                        
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    
+    
+{% endblock %}
+
+{% block jscontent %}
+
+<script src="{{url_for('static',filename='/js/tablefield_editable.js')}}"></script>
+    
+<script>
+    function openModal() {
+      document.getElementById('create_product').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('create_product').style.display = 'none';
+    }
+  </script>
+{% endblock %}

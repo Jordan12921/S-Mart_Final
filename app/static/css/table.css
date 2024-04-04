@@ -1,0 +1,59 @@
+/* Reset some default table and container styles */
+.table-container {
+    /* max-width: 800px; */
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .table-container.maxheight-450{
+    max-height:450px;
+  }
+  .table-container.maxheight-800{
+    max-height:800px;
+  }
+  .scrollable{
+    overflow: scroll;
+  }
+  .table-container h3{
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  /* Style table headers */
+  th {
+    background-color: var(--blue-gray-color);
+    color:var(--background-color);
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  /* Style table rows */
+  tr {
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Style alternating row colors */
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* Style table cells */
+  td {
+    padding: 10px;
+  }
+  
+  /* Hover effect on table rows */
+  tr:hover {
+    background-color: #e5e5e5;
+  }
+

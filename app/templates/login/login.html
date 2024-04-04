@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/flex.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}">
+    <style>
+        
+
+        
+    </style>
+</head>
+<body 
+    <div class="content-wrapper">
+        <div class="login-container" >
+            <h2>User Login</h2>
+            <br>
+            <br>
+            <div class= "form">
+                <form class="flex flex-direction-column d-flex" style="min-width: 350px; min-height: 300px margin-left:400px" action="{{url_for('auth.login')}}" method="post">
+                    {{ form.csrf_token }}
+                        
+                    {{ form.email.label }}
+                    {{ form.email()}}
+                    {% for error in form.email.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                        <br>
+                        <br>
+                        {{ form.password.label }}
+                        {{ form.password()}}
+                        {% for error in form.password.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                    <br>
+                    <br>
+                    <div class="field">
+                        <label class="checkbox">
+                            <input type="checkbox" name="remember">
+                            Remember me
+                        </label>
+                    </div>
+                    <input type="submit" class="button info" value="Login">
+                        
+                </form>
+                    
+                <div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class="flashes">
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    {% endwith %}
+                    </div>
+                    <br>
+                    <p id="forget_">Forget Password? <span style="color: var(--info-color); cursor: pointer ; text-decoration: underline;"> click here</span></p>
+                    <br>
+                    <div  style="display: none;" id="reset_password">
+                        <form class="flex flex-center-center flex-direction-column" style="min-width: 300px;" action="{{url_for('auth.general_reset_password')}}" method="post">
+                            <span style="text-align: center;"> -- </span>
+                            <label for="email">Email</label>
+                            <input type="email" name="email" id="" style="width: 100%;" required><br>
+                            <label for="secret_pin">6 digits pins</label>
+                            <input type="number" name="secret_pin" id="" min="6" style="width: 100%;" required><br>
+                            <span>Enter your 6 digits pin to reset password</span><br>
+                            <input type="submit" class="button info" value="Reset">
+                        </form>
+                    </div>
+                </div>
+            </div>
+    
+    </div>
+
+    <script>
+        document.getElementById('forget_').addEventListener('click',(e)=>{
+            console.log('ssss')
+            var d = document.getElementById('reset_password')
+            d.style.display = 'block';
+            e.target.style.display = 'none';
+        })
+    </script>
+</body>
+</html>

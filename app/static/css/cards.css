@@ -1,0 +1,135 @@
+
+  /* Grid System Layout */
+  .grid {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.grid-column-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.grid-column-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.grid-column-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-column-8 {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+}
+
+.grid-column-8 div:first-child {
+    grid-column: span 6;
+}
+
+.grid-column-8 div:last-child {
+    grid-column: span 2;
+}
+
+/* Cards */
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--bg-color-light);
+    /* border-radius: 16px; */
+    min-height: 160px;
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+}
+
+.card-header {
+    padding:0 0 0.6rem 0;
+    /* margin-bottom: 0.6rem; */
+    border-bottom: 1px solid var(--text-color-dark-grey);
+}
+
+.card-contents {
+    /* margin: 1.2rem 0; */
+    padding: 0.8rem 0;
+}
+
+.card-bottom {
+    display: flex;
+    /* flex-wrap: nowrap; */
+    justify-content: space-between;
+    border-top: 1px solid var(--text-color-dark-grey);
+    padding: 0.6rem 0 0 0;
+}
+
+.icon-text {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.card i {
+    font-size: 2.3rem;
+    /* padding-right: 16px; */
+}
+
+.card-text {
+    padding: 10px 0;
+}
+
+.card-text p {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.card-text span {
+    color: var(--text-color);
+}
+
+/* Responsive Styles */
+@media (max-width: 550px) {
+    .grid-column-2,.grid-column-2 .card {
+        grid-column: span 2;
+    }
+    .grid-column-3 .card {
+        grid-column: span 3;
+    }
+    .grid-column-4 .card {
+        grid-column: span 4;
+    }
+
+    .grid-column-8 div:first-child {
+        grid-column: span 8;
+    }
+}
+
+
+@media (min-width: 550px) and (max-width: 767px) {
+
+    .grid-column-3 .card {
+        grid-column: span 1.5;
+    }
+    .grid-column-4 .card {
+        grid-column: span 2;
+    }
+
+    .grid-column-8 div:first-child {
+        grid-column: span 8;
+    }
+
+    .grid-column-8 div:last-child {
+        grid-column: span 8;
+        grid-row-start: 1;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .grid-column-3 .card {
+        grid-column: span 3;
+    }
+    .grid-column-4 .card {
+        grid-column: span 2;
+    }
+}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block nav_title %} Cashflow Overview > <a href="{{url_for('cashflow.record_detail',id=cashflow.id)}}">Cashflow</a>{% endblock %}
+{% block nav_cashflow %}active{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}"> 
+    <style>
+        .card{
+            max-width:600px
+        }
+        .card > .card-contents >div.flex>form{
+            min-width: 250px;
+            padding: 10px 20px 10px 10px;
+        }
+
+        @media (max-width: 550px) {
+            form.flex{
+                width: 100%;
+            }
+            textarea{
+                width: 100% !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<a href="{{url_for('cashflow.index')}}"><b>Go Back</b></a><br><br>
+<div class="card">
+    <div class="card-header">
+
+        <h3 style="text-align: center;"><b>{{cashflow.particulars}}</b></h3>
+    </div>
+    <div class="card-contents">
+        
+        <p>Date: {{cashflow.date}}</p>
+        <p>Debit: RM {{"%.2f"|format(cashflow.debit)}}     |     Credit: RM {{"%.2f"|format(cashflow.credit)}}</p>
+        <p>Balance: RM {{"%.2f"|format(cashflow.balance)}}</p>
+        <br>
+        <p>Remarks: <span>{{cashflow.remarks}}</span></p>
+    </div>
+    <div class="card-bottom flex flex-end-center">
+        {% for role in current_user.roles if role.name == 'admin' %}<a href="{{url_for('cashflow.delete_cashflow',cashflow_id = cashflow.id)}}" style="color: red;">Delete record</a>{% endfor %}
+    </div>
+        
+</div>
+<br>
+{% for role in current_user.roles if role.name == 'admin' %}
+
+<div class="card">
+    <div class="card-header">
+        <h4 style="text-align: center;"><b>UPDATE </b>FORM</h4>
+    </div>
+    <div class="card-contents">
+
+        <div class="flex flex-direction-row">
+            <form action="{{url_for('cashflow.update_record',id=cashflow.id)}}" method="post" class="flex flex-direction-column">
+
+                <label for="particular">Particular</label>
+                <input type="text" name="new_particular" id="" placeholder="{{cashflow.particulars}}" value="{{cashflow.particulars}}" required>
+                
+                <label for="debit">Debit</label>
+                <input type="number" name="new_debit" id="" value="{{"%.2f"|format(cashflow.debit)}}" min="0" step="0.01" required>
+                <label for="credit">Credit</label>
+                <input type="number" name="new_credit" id="" value="{{"%.2f"|format(cashflow.credit)}}" min="0" step="0.01" required>
+                <label for="remark">Remark</label>
+                <textarea name="new_remark" id="remark" rows="10" style="width: 250px; min-width: 150px; max-width: 500px;">{{cashflow.remarks}}</textarea>
+                <input class="button success" type="submit" value="Update">
+            </form>
+            
+
+            <form class="flex flex-direction-column" method="post" action="{{url_for('cashflow.update_cashflow_date',id=cashflow.id)}}">
+
+                <label for="date">Date</label>
+                
+                <div class="">
+                    
+                    <label for="chk_specific_time">Define Specific Time:<input type="checkbox" id="chk_time" style="margin-left: 5px; width: 30px;"></label>
+                    <!-- <input type="date" name="new_date" id="new_date" value="{{cashflow.date.date()}}" disabled> -->
+                    <input type="date" name="new_date" id="new_date" value="{{cashflow.date.date()}}" disabled required>
+                    <input type="time" name="new_time" id="new_time" value="{{cashflow.date.time()}}"disabled required >
+                </div>
+                <br>
+                <input class="button info" type="submit" value="Change Time" id="btn-changetime" disabled>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+
+{% block jscontent %}
+
+    <script>
+        document.getElementById('chk_time').addEventListener('change',(e)=>{
+            var new_date = document.getElementById('new_date')
+            var new_time = document.getElementById('new_time')
+            var timebtn = document.getElementById('btn-changetime')
+
+            if (e.target.checked) {
+                new_date.disabled = false;
+                new_time.disabled = false;
+                timebtn.disabled = false;
+            } else {
+                new_date.disabled = true;
+                new_time.disabled = true;
+                timebtn.disabled = true;
+            }
+        })
+    </script>
+{% endblock %}

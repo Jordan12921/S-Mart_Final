@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block nav_title %} Import & Export Overview {% endblock %}
+{% block nav_ImExport %}active{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <style>
+
+
+        .custom-box{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            color: var(--text-color);
+            padding: 20px;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .custom-box:hover{
+            background-color: #727272dc;
+            color: #ffffff;
+            transition: all 0.5s;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+
+
+<h3>Import</h3>
+<p>Only Admin can import data & CSV</p>
+<br>
+{% for role in current_user.roles if role.name == 'admin' %}
+<div class="flex flex-item-center" style="margin-bottom: 30px;">
+    <a class="custom-box" href="{{url_for('utils.import_overview',entity="product")}}">Product</a>
+    <a class="custom-box" href="{{url_for('utils.import_overview',entity="inventory")}}">Inventory</a>
+    <a class="custom-box" href="{{url_for('utils.import_overview',entity="users")}}">Staff</a>
+</div>
+{% endfor %}
+
+<h3>Export</h3>
+<br>
+<div class="flex flex-item-center" style="margin-bottom: 30px;">
+    <a class="custom-box" href="{{url_for("main.sales_report")}}">Sales Report</a>
+    <a class="custom-box" href="{{url_for('main.cashflow_report')}}">Cash Flow</a>
+</div>
+
+{% endblock %}

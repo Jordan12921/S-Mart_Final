@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block nav_title %} Cashflow Overview > <a href="{{url_for('main.cashflow_report')}}"> Report</a>{% endblock %}
+{% block nav_ImExport %}active{% endblock %}
+{% block css_style %}
+
+{% endblock %}
+{% block content %}
+<form action="{{url_for("main.generate_cashflow_report")}}" method="get">
+    <label for="date">Select Date:</label>
+    <input type="month" name="date" required>
+    <input type="submit" value="Generate Report">
+</form>
+{% endblock %}

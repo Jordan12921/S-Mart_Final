@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block nav_title %} Cash Flow{% endblock %}
+{% block nav_cashflow %}active{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}">
+    <style>
+        .card{
+            min-width: 300px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<h2 style="text-align: left;">{{date}}</h2>
+<div class="grid-container four-two-grid">
+    <div class="card" style="max-height: 763px; overflow-y: scroll;">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Particulars</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Balance</th>
+                <th>Action</th>
+            </tr>
+            {% for row in cashflows %}
+            <tr>
+                <td>{{row.date}}</td>
+                <td>{{row.particulars}}</td>
+                <td>{% if row.debit %}{{"%.2f"|format(row.debit)}}{% else %} 0 {% endif %}</td>
+                <td>{% if row.credit %}{{"%.2f"|format(row.credit)}}{% else %} 0 {% endif %}</td>
+                <td>{% if row.balance %}{{"%.2f"|format(row.balance)}}{% else %} 0 {% endif %}</td>
+
+                <td>{% if row.particulars != "balance b/f" %}<a href="{{url_for('cashflow.record_detail',id=row.id)}}">view</a> {% endif %}</td>
+            </tr>
+            
+            {% endfor %}
+        </table>
+    </div>
+    <div class="flex flex-center-center flex-direction-column">
+        <div class="card" style="justify-content: space-evenly  !important;">
+            <div class="card-header">Select Year and Month</div>
+            <div class="card-contents">
+
+                <form action="{{url_for('cashflow.index',id=current_user.id)}}" method='get'>
+                    
+                    <input type="month" name="date" value="{{date}}" />
+                    <input type="submit" class="button success" value="Search">
+                </form>
+            </div>
+        </div>
+        <br>
+        {% for role in current_user.roles if role.name == 'admin' %}
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="flex flex-between-center">
+
+                    <p id="switch-text">Insert records</p>
+                </div>
+            </div>
+            <div class="card-contents">
+                <form action="{{url_for('cashflow.insert_cashflow')}}" id="insert-form" method="post" >
+                    <label for="particulars">Particulars</label>
+                    <input type="text" placeholder="particulars" name="particulars">
+                    <label for="date">Date</label>
+                    <input type="date" name="new_date" id="date" required>
+                    <label for="">Time</label>
+                    <input type="time" name="new_time" id="time" step="2" required>
+                    <label for="particulars">Debit</label>
+                    <input type="number" placeholder="debit" name="debit" value="0" min="0.00" step="0.01" required>    
+                    <label for="particulars">Credit</label>
+                    <input type="number" placeholder="credit" name="credit" value="0" min="0.00" step="0.01" required>
+                    <label for="particulars">Remarks</label>
+                    <textarea type="text" placeholder="remarks" value="" name="remark" style=" resize: none;" rows="4"></textarea>
+                    <input type="submit" class="button success" value="Add">
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block jscontent %}
+
+{% endblock %}

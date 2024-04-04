@@ -1,0 +1,428 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300;0,400;0,500;0,700;0,800;1,300;1,400&family=Roboto:wght@300;400;500;700;900&display=swap');
+
+:root {
+    --text-color:#212529;
+    --text-color-grey:#c2c7d0;
+    --text-color-dark-grey:#898989;
+    --main-color:#007bff;
+    --main-color-hover:#228dff;
+    /* --second-color:;
+    --second-color-hover:; */
+    --white-color:#fff;
+    --bg-color-dark:#343a40;
+    --bg-color-second-light:#dee2e6;
+    --bg-color-light:#f4f6f9;
+    --toggle-color:#ddd;
+
+
+    --red-color:#dc3545;
+    --dark-yellow-color:#ffc107;
+    --yellow-color:#ffc107;
+
+
+    --sidebar-width:18%;
+}
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+*{
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scrollbar-width: none;
+}
+a{
+    text-decoration: none;
+    color: var(--main-color);
+}
+
+a:hover{
+    color: var(--main-color-hover);
+}
+
+ul,li{
+    list-style: none;
+}
+
+img{
+    width: 100%;
+    object-fit: cover;
+}
+
+body{
+    background-image: url('../img/login_background.jpg');
+    width: 100%;
+    height: 100%;
+    /* background: #e9ecef;
+    position: relative; */
+}
+
+body.dark {
+    /* --body-color: #18191A;
+    --sidebar-color: #242526;
+    --primary-color: #3A3B3C;
+    --primary-color-light: #3A3B3C;
+    --toggle-color: #FFF;
+    --text-color: #CCC; */
+}
+
+.wrapper{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    overflow: hidden;
+   
+}
+.container{
+    margin: 20px auto;
+    padding: 20px;
+    /* background-color: #fff; */
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    
+}
+
+
+
+.container_item{
+    padding: 0 20px;
+
+    /* border-radius: 8px; */
+
+    /* margin-bottom: 30px; */
+    /* background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  */
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin:25px 0 20px 0;
+}
+
+.column {
+    flex: 1;
+    padding: 0 10px;
+    /* margin-right: 20px; */
+  }
+
+
+
+.btn {
+    border: 1px solid transparent;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: .375rem .75rem;
+    color: #212529;
+    border-radius: .25rem;
+    background-color: transparent;
+    
+    transition: color .15s ease-in-out .05s;
+}
+
+input{
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* input{
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: .25rem 0 0 .25rem;
+    box-shadow: inset 0 0 0 transparent;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    padding: .375rem .75rem;
+    height: calc(2.25rem +2px);
+}
+
+.input-group{
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.input-append-icon{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15%;
+    border: 1px solid #ced4da;
+    border-radius: 0 .25rem .25rem 0;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    text-align:center;
+    color: #495057;
+}
+.row{
+    margin-bottom: 60px;
+
+} */
+
+
+aside{
+    position: relative;
+    width: 15px;
+    height: 100vh;
+    background: var(--bg-color-dark);
+    transition: margin-left .3s ease-in-out .3s ease-in-out;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    z-index: 999;
+    color: var(--text-color-grey);
+    transition:width 0.3s linear;
+}
+aside.opened{
+    width: var(--sidebar-width);
+}
+
+
+.sidebar{
+    padding: 0.625rem 1rem;
+    height: 100%;
+}
+.sidebar li{
+    margin-bottom: .2rem;
+    padding: .5rem 1rem;
+    align-items: flex-end;
+    display: flex;
+    border-radius: 10px;
+}
+aside:hover>.sidebar li{
+    content: '';
+}
+
+
+/* Sidebar Logo side*/
+.brand-items{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: rgba(255, 255, 255, 0.3) 1px solid ;
+}
+.brand-items img{
+    width: 50px;
+    object-fit: cover;
+    padding: 0 5px 0 0;
+}
+.brand-logo{
+    display: flex;
+    align-items: center;
+}
+.brand-logo h3{
+    font-size: 1.1rem;
+}
+
+
+/* Menu */
+.menu-bar{
+    height: calc(100% - 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.menu-links{
+    margin-top: 1rem;
+}
+
+.menu-link:hover{
+    color: var(--bg-color-light);
+    background: rgba(200, 200, 200, 0.3);
+    cursor: pointer;
+}
+
+.menu-link.active{
+    background: var(--main-color);
+    color: var(--white-color);
+    transition: .05s ease-in-out .03s;
+}
+
+.menu-link.active:hover{
+    background: var(--main-color-hover);
+}
+.menu-link .nav-icon{
+    text-align: center;
+    margin-right: .2rem;
+    font-size: 1.6rem;
+    width: 1.6rem;
+}
+.menu-link a{
+    color: var(--text-color-grey);
+}
+.bottom-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    padding: .2em 1em;
+    font-size: 0.9rem;
+}
+.bottom-content i{
+    font-size: 1.6rem;
+    
+    margin-right: 10px;
+}
+.bottom-content div{
+    display: flex;
+    align-items: center;
+}
+
+
+
+/* Darkmode css */
+.toggle-switch{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    cursor: pointer;
+    /* margin: auto; */
+}
+
+.toggle-switch .switch{
+    position: relative;
+    height: 22px;
+    width: 44px;
+    border-radius: 25px;
+    background: var(--toggle-color);
+    
+}
+
+.switch::before {
+    height: 15px;
+    width: 15px;
+    content: "";
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    position: absolute;
+    background: var(--bg-color-light);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+body.dark .switch::before {
+    left: 24px;
+}
+/* End Dark mode css */
+
+
+.main{
+    width: calc(100% - var(--sidebar-width));
+    height: 100%;
+    background: var(--bg-color-light);
+    transition: width .3s ease-in;
+    
+    
+}
+.main.full-page{
+    width: 100%;
+    transition: width 0s ease-in-out;
+}
+
+
+.main-header{
+    position: relative;
+    padding: .7rem .7rem;
+    display: flex;
+    justify-content: space-between;
+    background: var(--text-color-grey);
+}
+
+.left-nav{
+    display: flex;
+    align-items: center;
+    /* gap: 15px; */
+}
+.menu-burger{
+    font-size: 1.8rem;
+}
+.mobile.menu-burger{
+    display: none;
+}
+.left-nav .menu-burger{
+    padding: 0 0.3rem;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.menu-burger:hover{
+    color: #007bff;
+}
+/* aside ~ .menu-burger:hover{
+    width: var(--sidebar-width) 
+} 
+ body:has(.menu-burger:hover) aside, body:has(.main-header:hover+.left-nav:hover) aside, aside:hover{
+    width: var(--sidebar-width) !important;
+    /* position: absolute;
+    top: 0;
+    left: 0; */
+/*} */
+
+
+
+
+.main-container{
+    /* background: var(--dark-yellow-color); */
+    padding: 1rem 1rem 4rem 1rem;
+    overflow: scroll;
+    height: 100%;
+}
+
+.bg {
+    /* background-image: url('../img/login_background.jpg'); */
+    height: 800px;
+    width: 800px;
+    /* background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover; */
+    
+}
+
+.custom-container{
+    /* width: 450px;
+    height: 400px; */
+    padding: 30px;
+    /* margin: auto; */
+    /* align-items: center;
+    justify-content: center; */
+    margin-left: 300px;
+    margin-top: 110px;
+    background: #f3f3f3;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust height as needed */
+  }
+
+.login-container {
+    /* Styles for login container */
+    padding: 30px;
+    max-width: 450px; /* or any other measurements */
+    margin-right: 20px; /* Adds some space between login and image */
+    background: #f3f3f3;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+  
+
+
+
+

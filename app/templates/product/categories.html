@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block nav_title %} Categories {% endblock %}
+{% block css_style %} 
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+{% endblock %}
+{% block nav_category %}active{% endblock %}
+{% block content %}
+<span class="title"><h1>{% block title %} Categories {% endblock %}</h1></span>
+
+<div class="grid-container four-two-grid">
+    <div class="grid-item">
+        {% if form.name.errors %}
+
+            <li>Something went wrong,please try again</li>
+
+        {% endif %}
+        {% for field, errors in form.errors.items() %}
+        <ul class="errors">
+            {% for error in errors %}
+            <li>{{field}}: {{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+        <div class="table-container maxheight-800">
+
+            <table>
+            <thead>
+                <tr>
+                <th>ID</th>
+                <th>Category</th>
+                <!-- Add other header columns as needed -->
+                <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                <form method="POST" action="{{ url_for('category.edit_category',category_name = category.Name) }}" style="display: inline-block;">
+                {{ form.csrf_token }}
+                <td>
+                    <span>{{ category.id }}</span>
+                </td>
+                <td>
+                    
+                    <span>{{ category.Name }}</span>
+                    {{ form.name(value=category.Name,style="display:none;")}}
+          
+                  </td>
+        
+                <!-- Add other data columns as needed -->
+                <td>
+                    <button class="button gray" type="button" id="edit" href="javascript:;"><i class='bx bx-columns'></i></button>
+                    
+                    <button class="button info" type="submit" id="update" style="display: none;"><i class='bx bx-check' ></i></button>
+                    <button class="button gray" type="button" id="cancel" href="javascript:;" style="display: none;"><i class='bx bx-x'></i></button>
+                
+                </form>
+                    {% for role in current_user.roles if role.name == 'admin' %}
+                    <form method="GET" action="{{url_for('category.delete_category',id = category.id)}}"
+                    style="display: inline-block;">
+                    <button class="button error" type="submit" id="delete" onclick="return confirm('Are you sure you want to delete this item?')"><i class='bx bx-trash-alt'></i></button>
+                    </form>
+                    {% endfor %}
+                </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        
+        </div>
+    </div>
+    <div class="grid-item">
+        <div class="form-container">
+            <h3>Search</h3>
+            
+            <form action="{{url_for('category.search_category')}}" method="get">
+
+                <input type="text" name="query" placeholder="seacrh"autocomplete="false">
+                
+                <button class="button success" type="submit">Search</button>
+            </form>
+        </div>
+        {% for role in current_user.roles if role.name == 'admin' %}
+        <div class="form-container">
+            <h3>Category</h3>
+            <form action="{{url_for('category.create_category')}}" method="post">
+                    <!-- <input type="text" name="category_name" id="" placeholder="Food.." autocomplete="false" required> -->
+                    {{ form.hidden_tag() }}
+                    {% if form.name.errors %}
+                        {% for error in form.name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+
+                    {{form.name.label}}
+                    <!-- <input type="text" id="category_name" name="category_name" required> <br> -->
+                    {{ form.name}}
+
+                    
+                    <button class="button success" type="submit">Add</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block jscontent %}
+<script src="{{url_for('static',filename='/js/tablefield_editable.js')}}"></script>
+<script>
+
+</script>
+{% endblock %}

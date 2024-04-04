@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-Mart Inventory System</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/responsive.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/cards.css')}}">
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/preloader.css')}}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    {% block css_style %}
+    {% endblock %}
+    <style>
+        .logout{
+            padding: .5rem 1rem
+        }
+        .logout:hover{
+            background: rgba(212, 212, 212, 0.3);
+            border-radius: 10px;
+            
+        }
+    </style>
+
+</head>
+<body>
+
+
+    <div class="wrapper">
+
+        <aside class="opened" id="aside">
+            <div class="sidebar">
+                <div class="brand-items">
+                    <div class="brand-logo">
+                        <img src="{{url_for('static',filename='/img/gear-loader.gif')}}" alt="" class="brand-img">
+                        <h3>Inventory System</h3>
+                    </div>
+                    <div class="mobile menu-burger">
+                        <i class='bx bx-menu '></i>
+                    </div>
+                </div>
+                <div class="menu-bar">
+                    <div class="menu">
+                        <ul class="menu-links">
+                            <li class="menu-link {% block nav_dashboard %}{% endblock %}"><i class='nav-icon bx bx-home'></i><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                            <li class="menu-link {% block nav_inventory %}{% endblock %}"><i class='nav-icon bx bxs-package'></i><a href="{{ url_for('product.index') }}">Products</a></li>
+                            <li class="menu-link {% block nav_category %}{% endblock %}"><i class='nav-icon bx bxs-category' ></i><a href="{{ url_for('category.index') }}">Category</a></li>
+                            <li class="menu-link {% block nav_supplier %}{% endblock %}"><i class='nav-icon bx bxs-buildings' ></i><a href="{{ url_for('supplier.index') }}">Supplier</a></li>
+                            <li class="menu-link {% block nav_report %}{% endblock %}"><i class='nav-icon bx bx-line-chart' ></i><a href="{{ url_for('sale.sales_index') }}">Sales</a></li>
+                            <li class="menu-link {% block nav_checkout %}{% endblock %}"><i class='nav-icon bx bx-dollar-circle' ></i><a href="{{ url_for('sale.show_checkout_page') }}">Check Out</a></li>
+                            <li class="menu-link {% block nav_cashflow %}{% endblock %}"><i class='nav-icon bx bx-book-content'></i><a href="{{url_for('cashflow.index')}}">Cash Flow</a></li>
+                            <li class="menu-link {% block nav_ImExport %}{% endblock %}"><i class='nav-icon bx bx-transfer'></i><a href="{{url_for('main.imexport_overview')}}">Import & Export</a></li>
+                            {% for role in current_user.roles if role.name == 'admin' %}
+                                <li class="menu-link {% block nav_staff %}{% endblock %}"><i class='nav-icon bx bxs-group' ></i><a href="{{ url_for('user.index') }}">Staff</a></li>
+                            {% endfor %}
+                            <li class="menu-link {% block nav_profile %}{% endblock %}"><i class='nav-icon bx bx-user-circle'></i><a href="{{url_for('user.get_staff',id=current_user.id)}}">Profile</a></li>
+                        </ul>
+                    </div>
+                    <div class="bottom-content logout">
+                        <div class="flex" style="color: #fff !important;">
+                            <i class='bx bx-log-out'></i><a style="color: #fff !important;" href="{{url_for('auth.logout')}}" onclick="return confirm('Log out immediately?')">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </aside>
+
+       <div class="main">
+            <header class="main-header">
+                <div class="left-nav">
+                    <div class="menu-burger">
+
+                        <i class='bx bx-menu '></i>
+                    </div>
+                    <p>{% block nav_title %}{% endblock %}</p>
+                </div>
+                
+                <div class="right-nav flex flex-center-center">
+                    <span>Welcome! <b>{{current_user.Last_Name + ' ' + current_user.First_Name}}</b></span>
+                </div>
+            </header>
+            <div class="main-container">
+                    {% block content %} {% endblock %}
+            </div>
+        </div> 
+    </div>
+   
+    <script>
+        const hamburger = document.querySelectorAll(".menu-burger");
+        const main = document.querySelector(".main");
+        var asside = document.getElementById("aside");
+        var root = document.documentElement;
+
+        hamburger.forEach((hamburger)=>{
+
+            hamburger.addEventListener("click",()=>{
+                
+                if (asside.classList.contains("opened")) { 
+                    console.log("yes")
+                    asside.classList.remove("opened");
+                    main.classList.toggle("full-page")
+                }else{
+                    asside.classList.toggle("opened");
+                    
+                    main.classList.remove("full-page")
+                }
+                // root.style.setProperty('--sidebar-width', '0%');
+            })
+        })
+    
+
+    </script>
+    <script src="DataTables/datatables.min.js">
+            
+        new DataTable('#example');
+    </script>
+    <script>
+        // $(document).ready(function () {
+        //     $('#data').DataTable({
+        //         columns: [
+        //         null,
+        //         {searchable: false},
+        //         {orderable: false, searchable: false},
+        //         {orderable: false, searchable: false},
+        //         null],
+        //     });
+        // });
+    </script>
+
+    {% block jscontent %}{% endblock %}
+    </body>
+    </html>

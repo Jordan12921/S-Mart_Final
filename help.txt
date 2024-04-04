@@ -1,0 +1,16 @@
+build and create virtual environment
+python -m venv <foldername>
+
+run environment
+app\venv\Scripts\activate.bat
+
+run project
+python -m flask --app  project2 run 
+python -m flask --app  project2 --debug run 
+
+install requirement
+pip install -r requirement.txt
+pip instal -e .
+
+latest update:
+run.bat

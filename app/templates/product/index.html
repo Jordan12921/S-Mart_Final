@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block nav_title %}Products Overview{% endblock %} 
+<!-- NOt USE -->
+{% block css_style %} 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <style>
+        .breadcrumb {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 5px 0;
+        }
+
+        .search-field {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-left: 10px;
+            width: 200px;
+            box-sizing: border-box;
+        }
+    </style>
+
+{% endblock %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+
+    <form action="{{ url_for('utils.excel_upload', entity='product') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <input type="submit" name="upload_excel" value="IMPORT">
+        <br><br>
+    </form>
+
+    <div class="breadcrumb">
+        {% for role in current_user.roles if role.name == 'admin' %}
+        <a href="{{ url_for('product.create_product') }}" class="button form-success">Add New</a> <br>
+        {% endfor %}
+        <form action="{{url_for('product.search_product')}}" method="get">
+
+            <input class="search-field" type="text" placeholder="Seach" name="query">
+            <button type="submit" class="form-success">Search</button>
+        </form>
+    </div>
+
+
+
+    <div class="table-container">
+
+        <table style="width: 100%;" class="">
+            <thead>
+                <tr>
+                    {% for colname in column_names if colname not in ['id'] %}
+                        <th>{{ colname }}</th>
+                    {% endfor %}
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <form method="POST" action="{{ url_for('product.edit_product', id=product.id) }}" style="display: inline-block;">
+                            <td>
+                                <span>{{ product.BarCode }}</span>
+                                <input type="text" style="display: none;" name="barcode" id="barcode" value="{{ product.BarCode }}" required>
+                            </td>
+                            <td>
+                                <span>{{ product.Name }}</span>
+                                <input type="text" style="display: none;" name="name" id="name" value="{{ product.Name }}" required>
+                            </td>
+                            <td>
+                                <span>{{ product.Category }}</span>
+                                <input type="text" style="display: none;" name="category" id="category" value="{{ product.Category }}" required>
+                            </td>
+                            <td>
+                                <span>{{ product.Quantity }}</span>
+                                <input type="number" style="display: none;" name="quantity" id="quantity" value="{{ product.Quantity }}" min=0 required>
+                            </td>
+                            <td>
+                                <span>{{ "%.2f"|format(product.RetailPrice) }}</span>
+                                <input type="number" style="display: none;" name="retail_price" id="retail_price" value="{{ product.RetailPrice }}" step=0.01 min=0 required>
+                            </td>
+    
+                            <td>
+                                <button type="button" class="button" id="edit" href="javascript:;">edit</button>
+                                <button type="submit" class="button" id="update" onclick="changeFormAction(this)" style="display: none;">Update</button>
+                                <button type="button" class="button" id="cancel" href="javascript:;" style="display: none;">Cancel</button>
+    
+                        </form>
+                        {% for role in current_user.roles if role.name == 'admin' %}
+                        <form method="POST" action="{{ url_for('product.delete_product', id=product.id) }}" style="display: inline-block;">
+    
+                                <button id="delete" class="button" type="submit" onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
+                        </form>
+                        {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        var btnEdits = document.querySelectorAll('#edit');
+        var btnCancels = document.querySelectorAll('#cancel');
+        var btnUpdate = document.querySelectorAll('#update');
+        var btnDelete = document.querySelectorAll('#delete');
+
+        btnEdits.forEach((btnEdit)=>{
+            btnEdit.addEventListener('click',editable);
+        });
+        
+        btnCancels.forEach((btnCancel)=>{
+            btnCancel.addEventListener('click',editable)
+        });
+
+        // btnDelete.forEach((btnDelete)=>{
+        //     var row = btnDelete.closest('tr');
+        //     btnDelete.addEventListener('click',()=>{
+
+        //         row.remove();
+        //     })
+        // })
+
+        // btnUpdate.forEach((btnUpdate)=>{
+        //         var form = btnUpdate.closest('form');
+        //         // var inputElements = row.querySelectorAll('input:not([type=radio])');
+
+
+        //         btnUpdate.addEventListener('click',()=>{
+        //             // inputElements.forEach((inputElement) => {
+        //             //     var closestSpan = inputElement.parentElement.querySelector('span');
+        //             //     var nearbySpan = inputElement.previousElementSibling; //get sibling element of the input: span
+        //             //     // Update the span text with the input value
+        //             //     if (nearbySpan && inputElement.value) {nearbySpan.textContent = inputElement.value;}
+        //             // });  
+        //             var closestBarcode = form.querySelector('#barcode');
+        //             console.log('Barcode: ',closestBarcode)
+        //             form.setAttribute('action',closestBarcode.value)
+        //         });
+        //         // btnUpdate.addEventListener('click',editable)
+        //     })
+
+        
+        function editable(event) {
+            var row = event.target.closest('tr');
+            var inputElements = row.querySelectorAll('input:not([type=radio])');
+            var spanElements = row.querySelectorAll('span');
+
+            inputElements.forEach((inputElement) => {
+                inputElement.style.display = (inputElement.style.display === 'none') ? 'inline-block' : 'none';
+            });
+            spanElements.forEach((spanElement) => {
+                spanElement.style.display = (spanElement.style.display === 'none') ? 'inline-block' : 'none';
+            });
+             // Toggle the display of the edit, update, and cancel links
+            row.querySelector('#edit').style.display = (row.querySelector('#edit').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#update').style.display = (row.querySelector('#update').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#cancel').style.display = (row.querySelector('#cancel').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#delete').style.display = (row.querySelector('#delete').style.display === 'none') ? 'inline-block' : 'none';
+        }
+
+        function changeFormAction(button){
+            var closesttd = button.parentElement;
+            var form = closesttd.parentElement;
+            if(form){
+                var barcodeInput = form.querySelector('#barcode');
+                //
+                console.log(barcodeInput)
+            }else{
+                console.log('Form not found')
+            }
+        }
+
+    </script>
+{% endblock %}

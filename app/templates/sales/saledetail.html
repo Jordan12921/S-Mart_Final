@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block nav_title %} Sales Overview > <a href="{{url_for('sale.get_sale_detail',date = date)}}">Sales</a>{% endblock %}
+{% block css_style %} 
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/modal.css')}}"> 
+    <style>
+
+    </style>
+{% endblock %}
+{% block nav_report %}active{% endblock %}
+
+
+{% block content %}
+
+<div class="grid-container two-grid">
+    <div class="grid-item">
+        <div class="">
+                
+                
+
+        </div>
+    </div>
+    <div class="grid-item">
+
+    </div>
+</div>
+<div class="table-container">
+    
+    <h3>Sale Items - {{date}}</h3>
+
+    
+    
+    <table >
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Inventory ID</th>
+                <th>Quantity</th>
+                <th>Sale Price</th>
+                <th>Sale Person</th>
+            </tr>
+        </thead>
+        <tbody>{% for sale in sales %}
+                {% for item in sale.Sale_items %}
+                <tr>
+                    <td >
+                        {% for product in products %}
+                        {% for inventory in product.Inventories %}
+                        {% if inventory.id == item.Inventory_id%}
+                        {{product.Name}}
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for product in products %}
+                        {% for inventory in product.Inventories %}
+                        {% if inventory.id == item.Inventory_id%}
+                        {{inventory.id}}
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{item.Quantity}}
+                    </td>
+                    <td>
+                        {{"%.2f"|format(item.SalePrice)}}
+                    </td>
+                    <td>
+                        {% for user in users %} {% if str(user.id) == sale.Staff_id %}{{user.Last_Name}}{% endif %} {% endfor %}{{sale.Staff_id}}
+                    </td>
+                   
+                </tr>
+                
+                {% endfor %}{% endfor %}
+            </tbody>
+        </table>
+    
+</div>
+{% endblock  %}
+
+
+
+{% block jscontent %}
+{% endblock  %}

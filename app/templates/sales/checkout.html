@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block nav_title %} Checkout Page{% endblock %}
+{% block css_style %} 
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/modal.css')}}"> 
+
+{% endblock %}
+{% block nav_checkout %}active{% endblock %}
+{% block content %}
+
+
+    <div class="flex flex-between-end" style="padding: 1rem 0 0 0;">
+        <div class="container_item">
+            <p>Sale ID: {{sale.id}} </p>
+            <p>Date: {{sale.Date}} </p>
+            <p>Staff: {{username}} (ID: {{sale.Staff_id}})</p>
+        </div>
+        <div class="container_item">
+    
+            <input type="text" id="search_field" onkeyup="prodcut_search()" placeholder="Search for Barcode" title="Type in a barcode">
+        </div>
+    </div>
+
+    <div class="grid-container four-two-grid">
+        <div class="grid-item">
+            <div class="table-container" style="max-height: 750px; overflow-y: scroll;">
+                <table id="product_list">
+                    <tr>
+                        <th>Barcode</th>
+                        <th>Product Name</th>
+                        <th>QTY</th>
+                        <th>Retail Price</th>
+                        <th></th>
+                    </tr>
+                    
+                    {% for product in products %}
+                    {% set available_QTY = product.Inventories | map(attribute='Available_QTY') | sum %}
+                    <tr>
+                    <td>{{product.BarCode}}</td>
+                    <td>{{product.Name}}</td>
+                    <td>{{available_QTY}}</td>
+                    <td>
+                        {% set aprice =  [] %}
+                        {% for inventory in product.Inventories %}
+                            {% if inventory.Available_QTY > 0 %}
+                            {% set _ = aprice.append(inventory.RetailPrice) %}
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if aprice and aprice[0] %}
+                                {{ "%.2f"|format(aprice[0]) }}
+                            {% else %}
+                                {{ aprice[0] }}
+                            {% endif %}
+                    </td>
+                    <td><a href="{{url_for("sale.add_sale_item",item = product.id)}}"><i class='bx bxs-add-to-queue'></i></a></td>
+                </tr>
+                {% endfor %} 
+                </table>
+                
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="table-container">
+                <h3>Check Out</h3>
+
+                <table class="">
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>QTY</th>
+                        <th>SalePrice</th>
+                        <th></th>
+                    </tr>
+                    {% if sale %}
+                    {% set counter = 0 %}
+                    {% for item in sale.Sale_items %}
+                    {% set counter = counter + 1 %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% for product in products %}
+                            {% for inventory in product.Inventories %}
+                            {% if inventory.id == item.Inventory_id %}
+                           
+                            {{product.Name}}
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ item.Quantity }}</td>
+                        <td>
+
+                            {{ "%.2f"|format(item.SalePrice) }}
+                        </td>
+                        <td><a href="{{url_for('sale.remove_sale_item_from_checkout',item = item.id)}}"><i class='bx bx-minus'></i></a></td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </table>
+            </div>
+            <div class="form-container">
+                <h3>Payment</h3>
+
+                <form method="post" action="{{url_for('sale.finalize_checkout',id = sale.id)}}">
+                    {{ form.hidden_tag() }}
+                    {{form.type_payment.label}}
+                    {{ form.type_payment(class_="form-control")}}
+                    {{form.no_refer.label}}
+                    {{form.no_refer(class="form-control") }}
+                    <p>Subtotal: <span id="subtotal">{{ "%.2f"|format(sale.Total) }}</span></p><br><br><br>
+                    {{form.discount.label}}
+                    {{ form.discount(class="form-control",value=0) }}
+                    {{form.total.label}}
+                    {{form.total(class="form-control") }}
+                    
+
+                    {{form.custom_price(class="form-check-input") }}
+                    {{form.custom_price.label(style="display:inline-block")}}
+                    <br><br>
+                    {{form.submit(class="button success")}}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}
+
+{% block jscontent %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const discountInput = document.querySelector("input[name='discount']");
+            const subtotal = document.getElementById('subtotal');
+            console.log(subtotal)
+            // Function to calculate total amount
+            function calculateTotal() {
+                
+                stotal = parseFloat(subtotal.innerText);
+                console.log(stotal)
+                subtotal.innerText= stotal
+                const discount = parseFloat(discountInput.value);
+                const total = parseFloat((stotal) - (stotal *(discount/100))).toFixed(2);
+                document.querySelector("input[name='total']").value = total;
+            }
+
+            // Add event listeners to tax and discount inputs
+            discountInput.addEventListener("input", calculateTotal);
+
+            // Initially calculate total amount
+            calculateTotal();
+        });
+    </script>
+
+    <script>
+        function prodcut_search(){
+           // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_field");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("product_list");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+                }
+            }
+        }
+
+    
+    </script>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block nav_title %} Products Overview > <a href="{{url_for('product.get_product',id = product.id )}}">Product</a>{% endblock %}
+
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/category.css')}}"> 
+{% endblock %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+    
+    <div class="grid-container four-two-grid">
+        <div class="grid-item">
+
+            <div class="form-container full_width">
+            <h3>Edit Product</h3>
+    
+                <form method="POST" action="{{ url_for('product.edit_product',id = product.id) }}">
+                    {{ form.hidden_tag() }}
+                    <!-- Add any necessary form fields and styling as needed -->
+                    {{ form.barcode.label }}
+                    {{ form.barcode( value = product.BarCode) }}
+
+                    {{ form.name.label }}
+                    {{ form.name( value = product.Name) }}
+
+                    <div class="flex flex-start-center" style="margin-bottom: 10px;">
+                    {{ form.safety_quantity_custom.label(style='margin:0') }}
+                    {{ form.safety_quantity_custom(style='margin-left:15px') }} 
+                   </div>
+
+                    {{ form.safety_quantity.label }} {{ form.safety_quantity(value = product.Safety_quantity) }}
+                    {{ form.status.label }} 
+
+                    {% for choice_key, choice_label in form.status.choices %}
+                        <input type="radio"  name="status" value="{{choice_key}}" {% if choice_key == product.Status %} Checked {% endif %}> {{ choice_label }}
+                        <br>
+                    {% endfor %}
+
+                    <br>
+                    <button class="button info" type="submit">Save Changes</button>
+                </form>
+            </div> 
+
+            <div class="table-container">
+                <h3>Available Inventory</h3>
+                <table style="width: 100%;" class="">
+                    <thead>
+                        <tr>
+                            
+                            <th>Store-In</th>
+                            <th>Expiry-Date</th>
+                            <th>Supplier</th>
+                            <th>Init QTY</th>
+                            <th>Available QTY</th>
+                            <th>Locked QTY</th>
+                            <th>Lost QTY</th>
+                            <th>Sold QTY</th>
+                            <th>Cost Price (Per Item)</th>
+                            <th>Retail Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inventory in product.Inventories if inventory.ExpiryDate>=date.today() %}
+                            <tr>
+                                <form method="POST" action="" style="display: inline-block;">
+                                    <td><span>{{ inventory.StockInDate }}</span></td>
+                                    <td><span>{{ inventory.ExpiryDate }}</span></td>
+                                    <td><span>{{ inventory.Supplier_id }}</span></td>
+                                    <td><span>{{ inventory.Init_QTY }}</span></td>
+                                    <td><span>{{ inventory.Available_QTY }}</span></td>
+                                    <td><span>{{ inventory.Locked_QTY }}</span></td>
+                                    <td><span>{{ inventory.Lost_QTY}}</span></td>
+                                    <td><span>{{ inventory.Sold_QTY }}</span></td>
+                                    <td><span>{{ "%.2f"|format(inventory.CostPerItem) }}</span></td>
+                                    <td><span>{{ "%.2f"|format(inventory.RetailPrice) }}</span></td>
+                                    
+                                </form>
+                                <td>
+                                    <a href="{{url_for('product.inventory_detail',id=inventory.id)}}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-container">
+                <h3>Unvailable Inventory</h3>
+                <table style="width: 100%;" class="">
+                    <thead>
+                        <tr>
+                            
+                            <th>Store-In</th>
+                            <th>Expiry-Date</th>
+                            <th>Supplier</th>
+                            <th>Init QTY</th>
+                            <th>Available QTY</th>
+                            <th>Locked QTY</th>
+                            <th>Lost QTY</th>
+                            <th>Sold QTY</th>
+                            <th>Cost Price (Per Item)</th>
+                            <th>Retail Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inventory in product.Inventories if inventory.ExpiryDate<=date.today() %}
+                            <tr>
+                                <form method="POST" action="" style="display: inline-block;">
+                                    <td><span>{{ inventory.StockInDate }}</span></td>
+                                    <td><span>{{ inventory.ExpiryDate }}</span></td>
+                                    <td><span>{{ inventory.Supplier_id }}</span></td>
+                                    <td><span>{{ inventory.Init_QTY }}</span></td>
+                                    <td><span>{{ inventory.Available_QTY }}</span></td>
+                                    <td><span>{{ inventory.Locked_QTY }}</span></td>
+                                    <td><span>{{ inventory.Lost_QTY}}</span></td>
+                                    <td><span>{{ inventory.Sold_QTY }}</span></td>
+                                    <td><span>{{ "%.2f"|format(inventory.CostPerItem) }}</span></td>
+                                    <td><span>{{ "%.2f"|format(inventory.RetailPrice) }}</span></td>
+                                    
+                                </form>
+                                <td>
+                                    <a href="{{url_for('product.inventory_detail',id=inventory.id)}}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        {% for role in current_user.roles if role.name == 'admin' %}
+        <div class="grid-item">
+            
+    
+            <div class="form-container">
+                <h3>Inventory Store-In</h3>
+                <form action="{{url_for('product.add_inventory',barcode = product.BarCode)}}" method="post">
+                    {{ form.hidden_tag() }}
+                    <input type="text" name="name" id="" value="{{product.Name}}" disabled>
+                    
+                    
+                    {{ inventoryForm.product_id(value=product.id,style="display:none;") }}
+ 
+                    
+                    <select name="supplier" id="supplier" required>
+                        <option value="">Select Supplier</option>
+                        {% for choice_key, choice_label in inventoryForm.supplier.choices %}
+                            <option value="{{choice_key}}">{{choice_label}}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div>
+                        {{ inventoryForm.stock_in_date.label }}
+                        {{ inventoryForm.stock_in_date() }}
+                    </div>
+                    <div>
+                        {{ inventoryForm.expiry_date.label }}
+                        {{ inventoryForm.expiry_date() }}
+                    </div>
+                    <div>
+                        {{ inventoryForm.init_qty.label }}
+                        {{ inventoryForm.init_qty(step=1,min=0) }}
+                    </div>
+                    <div>
+                        {{ inventoryForm.cost_per_item.label }}
+                        {{ inventoryForm.cost_per_item(min=0.00,step=0.01,value=0) }}
+                    </div>
+                    <div>
+                        {{ inventoryForm.retail_price.label }}
+                        {{ inventoryForm.retail_price(min=0.00,step=0.01,value=0) }}
+                    </div>
+        
+                    <button class="button success" type="submit">Add</button>
+                </form>
+            </div>
+        
+            <div class="form-container">
+                
+                
+                <h2>Select Category</h2>
+                <form action="{{url_for('product.edit_product',id = product.id)}}" method="post">
+                    {{ form.hidden_tag() }}
+                    <ul class="category-list">
+                        {{ form.categories.label }}
+                        {% set pro_ids = [] %}
+                        {% for pro in product.Categories %}
+                            {% set _ = pro_ids.append(pro.id) %}
+                        {% endfor %}
+                        {% for category_id, category_name in form.categories.choices %}
+                        
+                        <li class="category-item">
+
+                            <input type="checkbox" class="category-input" name="categories" value="{{ category_id }}" {% if category_id in pro_ids %}checked{% endif %}> {{ category_name }}<br>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <button class="button info" type="submit" name="save_category">Save Changes</button>
+                </form>
+                
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    
+{% endblock %}

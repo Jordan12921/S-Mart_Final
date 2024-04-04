@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% block nav_title %} Dashboard Overview {% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/cards.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+ 
+{% endblock %}
+{% block content %}
+   
+<div class="grid grid-column-4">
+    <div class="card">
+        <div class="card-header">Supplier and Staff</div>
+        <div class="card-contents">
+            <div class="grid-column-2">
+
+                <div class="icon-text">
+                    <i class='bx bx-buildings'></i>
+                    <div class="card-text">
+                        <p>Supplier</p>
+                        <span>{{total_supplier}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bxs-group'></i>
+                    <div class="card-text">
+                        <p>Staff</p>
+                        <span>{{total_staff}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-bottom">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">Product</div>
+        <div class="card-contents">
+            <div class="grid-column-2">
+
+                <div class="icon-text">
+                    <i class='bx bxs-cube'></i>
+                    <div class="card-text">
+                        <p>Products</p>
+                        <span>{{product_count['total']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bxs-category' ></i>
+                    <div class="card-text">
+                        <p>Categories</p>
+                        <span>{{product_count['categories']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bx-package'></i>
+                    <div class="card-text">
+                        <p>Inventories</p>
+                        <span>{{product_count['total_inventories']}}</span>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Alerts</div>
+        <div class="card-contents">
+                
+            <div class="icon-text">
+                <i class='bx bxs-info-circle'></i>
+                <div class="card-text">
+                    <p>OutOfStock</p>
+                    <span>{{product_count['OutOfStock']}}</span>
+                </div>
+            </div>
+
+            <div class="icon-text">
+                <i class='bx bx-no-entry'></i>
+                <div class="card-text">
+                    <p>NotAvailable</p>
+                    <span>{{product_count['NotAvailable']}}</span>
+                </div>
+            </div>
+            <div class="icon-text">
+                <i class='bx bx-line-chart-down'></i>
+                <div class="card-text">
+                    <p>Products below safety level</p>
+                    <span>{{count_below_safety}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Wastage Product</div>
+        <div class="card-contents">
+
+            <div class="icon-text">
+                <i class='bx bxs-calendar-x' ></i>
+                <div class="card-text">
+                    <p>Expired</p>
+                    <span>{{product_count['expired']}}</span>
+                </div>
+            </div>
+            <div class="icon-text">
+                <i class='bx bx-task-x'></i>
+                <div class="card-text">
+                    <p>Inventory Lost </p>
+                    <span>{{product_count['inventory_lost']}}</span>
+                </div>
+            </div>
+            <div class="icon-text">
+                <i class='bx bxs-hot'></i>
+                <div class="card-text">
+                    <p>Lost Cost</p>
+                    <span>RM {% if product_count['lost_cost'] %}{{"%.2f"|format(product_count['lost_cost'])}}{% else %} 0 {% endif %}</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    
+</div>
+{% if inventory_warning %}
+<div class="grid grid-column-3">
+    <div class="card" style="justify-content: normal;">
+        <div class="card-header">Prodcuts under safety line</div>
+        <div class="card-contents">
+            
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Safety Line</th>
+                    <th>Available QTY</th>
+                </tr>
+                {% for pro in inventory_warning %}
+                
+                
+                <tr>
+                    <td><a href="{{url_for('product.get_product',id=pro.id)}}">{{pro.Name}}</a></td>
+                    <td>{{pro.Safety_quantity}}</td>
+                    <td>{{pro.Available_QTY}}</td>
+                </tr>
+                {%endfor%}
+            </table>
+
+
+        </div>
+        
+    </div>
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header">Lost Product</div>
+        <div class="card-contents">
+
+            <table>
+                <tr>
+                    <th>No</th>
+                    <th>Product</th>
+                    <th>Quantity Loss</th>
+                    <th>Stockin Price</th>
+                    <th>Total Loss</th>
+                </tr>
+                {% for p in product_lost %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td>{{p.Name}}</td>
+                    <td>{{p.Lost_QTY}}</td>
+                    <td>{{'%.2f' | format(p.CostPerItem)}}</td>
+                    <td>{{'%.2f' | format(p.Lost_QTY * p.CostPerItem)}}</td>
+
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    
+</div>
+{% endif %}
+
+<div class="grid">
+    <div class="card">
+        <div class="card-header" style= "grid-column">Almost Expiry Stock (30 days Threshold)  </div>
+        <div class="card-contents" style= "max-height: 220px; overflow-y: scroll">
+            <table>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Expiry Date</th>
+                    <th>Days to Expiry</th>
+                    <th>Available Quantity</th>
+                    <th>Retail Price</th>
+                </tr>
+                {% for item in product_threshold %}
+                <tr>
+                    <td>{{ item.Name }}</td>
+                    <td>{{ item.ExpiryDate }}</td>
+                    <td>{{ item.days_to_expiry }}</td>
+                    <td>{{ item.Available_QTY }}</td>
+                    <td>{{ '%.2f' | format(item.RetailPrice) }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="card-bottom"></div>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <div class="card-header">Sales,Inventory and Inventory Turnover</div>
+        <div class="card-contents">
+            <div id="turnover_bar" style="margin: auto;"></div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+</div>
+<div class="grid grid-column-2">
+    <div class="card">
+        <div class="card-header">Sales Overview</div>
+        <div class="card-contents">
+            <div class="grid-column-2">
+
+                <div class="icon-text">
+                    <i class='bx bx-line-chart'></i>
+                    <div class="card-text">
+                        <p>Total Sales</p>
+                        <span>{{sale_count['total_sales']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bx-objects-vertical-top'></i>
+                    <div class="card-text">
+                        <p>Monthly Profit</p>
+                        <span>RM {{sale_count['total_monthly_profit']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bx-objects-vertical-top'></i>
+                    <div class="card-text">
+                        <p>Daily Sales</p>
+                        <span>{{sale_count['total_daily_sales']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bx-objects-vertical-top'></i>
+                    <div class="card-text">
+                        <p>Daily Profit</p>
+                        <span>RM {{sale_count['total_daily_profit']}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Inventory Overview</div>
+        <div class="card-contents">
+            <div class="grid-column-2">
+
+                
+                <div class="icon-text">
+                    <i class='bx bx-objects-vertical-top'></i>
+                    <div class="card-text">
+                        <p>Total Quantities Sold</p>
+                        <span>{{product_count['total_sold']}}</span>
+                    </div>
+                </div>
+                <div class="icon-text">
+                    <i class='bx bx-objects-vertical-top'></i>
+                    <div class="card-text">
+                        <p>Cost of Inventory</p>
+                        <span>RM {% if product_count['total_inventory_cost'] %}{{ "%.2f"|format(product_count['total_inventory_cost'])}}{% else %}  {% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="icon-text">
+                <i class='bx bx-objects-vertical-top'></i>
+                <div class="card-text">
+                    <p>In Stock Products</p>
+                    <span>{{product_count['in_stock_products']}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+</div>
+<div class="grid">
+    <div class="card">
+        <div class="card-header">Sales Statistics</div>
+        <div class="card-contents">
+            <div id="sales-graph"></div>
+            <!-- <div id="tester" style=""></div> -->
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+</div>
+
+<div class="grid grid-column">
+    <div class="card">
+        <div class="card-header">Lost Cost</div>
+        <div class="card-contents">
+            <div id="lost_cost_barchart"></div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Inventory Value by Products</div>
+        <div class="card-contents">
+            <div id="prodcut_hbar"></div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">Proportion of products</div>
+        <div class="card-contents">
+            <div id="product_pie"></div>
+        </div>
+        <div class="card-bottom"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block jscontent %}
+    <script src="{{url_for('static',filename='/js/plotly-2.27.0.min.js')}}"></script>
+    <script>
+
+        // Parse the JSON data for the Plotly graph
+        var sales_graph = JSON.parse('{{ sales_graph | safe }}')
+        var product_proportion_pie = JSON.parse('{{ product_proportion_pie | safe }}');
+        var turnoverBar = JSON.parse('{{ turnover_bar | safe }}');
+        var vertical_product_bar = JSON.parse('{{ vertical_product_bar | safe }}');
+        var lost_cost_bar = JSON.parse('{{ lost_cost_bar | safe }}');
+
+            console.log("Hello World", sales_graph)
+        Plotly.newPlot('product_pie', product_proportion_pie.data, product_proportion_pie.layout, {"plot_bgcolor": "#fff"});
+        Plotly.newPlot('sales-graph', sales_graph.data, sales_graph.layout);
+        // Render the Plotly bar chart using Plotly.js
+        Plotly.newPlot('turnover_bar', turnoverBar.data, turnoverBar.layout);
+        Plotly.newPlot('prodcut_hbar', vertical_product_bar.data, vertical_product_bar.layout);
+        Plotly.newPlot('lost_cost_barchart', lost_cost_bar.data, lost_cost_bar.layout);
+    </script>
+{% endblock %}

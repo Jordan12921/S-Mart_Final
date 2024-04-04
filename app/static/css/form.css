@@ -1,0 +1,71 @@
+/* Reset some default form styles */
+form {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* Style the form container */
+.form-container {
+    max-width: 400px;
+
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container.full_width {
+    max-width: 100%;
+}
+
+.form-container h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Style form elements */
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="number"],
+form input[type="date"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+
+/* Style form error messages */
+.form-error {
+    color: #d9534f;
+    margin-top: 5px;
+}
+
+/* Style form success message */
+.form-success {
+    color: #5cb85c;
+    margin-top: 5px;
+}
+
+
+
+
+.form-group {
+    width: 50%;
+}

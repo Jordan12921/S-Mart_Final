@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block nav_import %}active{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+{% endblock %}
+{% block content %}
+
+<a href="{{url_for('utils.clear_tempExcelData',entity = entity)}}"><b style="text-decoration: underline;">Clear Data</b></a>
+    
+<div class="form-container">
+
+    <h3 style="text-align: center;">{% block title %} The import Page {% endblock %}</h3>
+    <form action="{{url_for('utils.upload_data',entity=entity)}}" method="post" enctype="multipart/form-data">
+        <input type = "file" name = "file"  />
+        <input type="submit" value="IMPORT" name="upload_excel">
+        <br><br>
+    </form>
+    <!-- #get template csv file -->
+    <a href="{{url_for('download_file',file_name = "template_"+entity)}}" style="text-align: center;">template_{{entity}}.xlsx</a>
+</div>
+
+
+
+
+{% if raw_data.bool and not raw_data.empty and not column_names.empty %}
+<div class="table-container" id="preview">
+    <h3>Preview</h3>
+    <form action="{{url_for('utils.validate_exceldata',entity=entity)}}" method="post">
+
+        <table name="data_table" style="font-size: 0.65rem;">
+            <thead>
+                <tr>
+                    {% for col in column_names %}
+                    <th>
+                        <span>{{col}}</span>
+                        <input type="text" style="display: none;"   name="column_names" value="{{col}}" required>
+                    </th>
+                    {% endfor %}
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for index, row in raw_data.iterrows() %}
+                <tr 
+                    {% if first_duplicate_rows.bool %}
+                        {% if index in first_duplicate_rows.index %} 
+                            style="background-color: rgb(182, 255, 195)"
+                        {% elif index in repeated_rows.index %}
+                            style="background-color: rgba(255, 182, 193, 1)"
+                        {% endif %} 
+                    {% endif %}
+                    >
+                    {% for col, row_ in zip(column_names, row) %}
+                    
+                    <td
+                        {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                        {% set row_ = " " %}   
+                        style="background: rgba(255,0,0,0.4);"
+                        {% endif %}
+                    >
+                        <span name="" >
+                            {% if raw_data[col].dtype == 'datetime64[ns]' %}
+                                {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                                    {{row_}}
+                                
+                                {% else %}
+                                    {{row_.strftime('%Y-%m-%d')}}
+                                {% endif %}
+                            {% else %}
+                                {{row_}}   
+                            {% endif %}
+                        </span>
+                        
+                        <input style="display: none;" name="{{col}}" id="" 
+                            {% if raw_data[col].dtype == 'int64' %}
+                                type="number"  step="0.0000000000000001" value="{{row_}}"
+                            {% elif raw_data[col].dtype == 'float64' %}
+                                type="number"  step="0.0000000000000001" value="{{row_}}"
+                            {% elif raw_data[col].dtype == 'datetime64[ns]' %}
+                                {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                                    type="date" value=""
+                                {% else %}
+                                    type="date" value="{{row_.strftime('%Y-%m-%d')}}"
+                                {% endif %}
+                            {% else %}
+                                type="text" value="{{row_}}"
+                            {% endif %}
+                        required>
+                    </td>
+                    {% endfor %}
+                    {% if not proceed %}
+                    <td>
+                        <a id="edit" href="javascript:;">edit</a>
+                        <a id="update" href="javascript:;" name="" style="display: none;">Update</a>
+                        <a id="cancel" href="javascript:;" style="display: none;">Cancel</a>
+                        <a id="delete" href="javascript:;">delete</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+            <button type="submit" class="button info" name="form_step_validation">Perform validation</button>
+        
+    </form>
+</div>
+
+
+<div style="margin: 10px auto; width: 100px;">
+
+    <form action="{{url_for('utils.perform_and_insertdata',entity=entity)}}" method="post">
+        <input type="submit" value="Submit">
+    </form>
+
+</div>
+{% endif %}
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+{% block jscontent %}
+
+<!-- JavaScript -->
+<script>
+    var btnEdits = document.querySelectorAll('#edit');
+    var btnCancels = document.querySelectorAll('#cancel');
+    var btnUpdate = document.querySelectorAll('#update');
+    var btnDelete = document.querySelectorAll('#delete');
+
+    btnEdits.forEach((btnEdit)=>{
+        btnEdit.addEventListener('click',editable);
+    });
+    
+    btnCancels.forEach((btnCancel)=>{
+        btnCancel.addEventListener('click',editable)
+    });
+
+    btnUpdate.forEach((btnUpdate)=>{
+        var row = btnUpdate.closest('tr');
+        var inputElements = row.querySelectorAll('input:not([type=radio])');
+
+        btnUpdate.addEventListener('click',()=>{
+            inputElements.forEach((inputElement) => {
+                var closestSpan = inputElement.parentElement.querySelector('span');
+                var nearbySpan = inputElement.previousElementSibling; //get sibling element of the input: span
+                // Update the span text with the input value
+                if (nearbySpan && inputElement.value) {nearbySpan.textContent = inputElement.value;}
+                inputElement.value = inputElement.value.trim();
+            });  
+        });
+        btnUpdate.addEventListener('click',editable)
+    })
+
+    btnDelete.forEach((btnDelete)=>{
+        var row = btnDelete.closest('tr');
+        btnDelete.addEventListener('click',()=>{
+
+            row.remove();
+        })
+    })
+
+    
+    function editable(event) {
+        var row = event.target.closest('tr');
+        var inputElements = row.querySelectorAll('input:not([type=radio])');
+        var spanElements = row.querySelectorAll('span');
+
+        inputElements.forEach((inputElement) => {
+            inputElement.style.display = (inputElement.style.display === 'none') ? 'inline-block' : 'none';
+        });
+        spanElements.forEach((spanElement) => {
+            spanElement.style.display = (spanElement.style.display === 'none') ? 'inline-block' : 'none';
+        });
+            // Toggle the display of the edit, update, and cancel links
+        row.querySelector('#edit').style.display = (row.querySelector('#edit').style.display === 'none') ? 'inline-block' : 'none';
+        row.querySelector('#update').style.display = (row.querySelector('#update').style.display === 'none') ? 'inline-block' : 'none';
+        row.querySelector('#cancel').style.display = (row.querySelector('#cancel').style.display === 'none') ? 'inline-block' : 'none';
+        row.querySelector('#delete').style.display = (row.querySelector('#delete').style.display === 'none') ? 'inline-block' : 'none';
+    }
+
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+.search_container {
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin:25px 0 20px 0;
+  }
+
+  .column {
+    flex: 1;
+    padding: 0 10px;
+    /* margin-right: 20px; */
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
+  select,
+  input[type="text"] {
+    width: 20rem;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  @media screen and (max-width: 600px) {
+    /* Adjust layout for smaller screens */
+    .column {
+      flex: 100%; /* Each column takes full width on smaller screens */
+      padding: 15px 0;
+    }
+  }

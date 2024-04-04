@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block nav_title %}
+Products
+{% endblock %}
+{% block css_style %}
+
+<link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/modal.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/button.css')}}">
+
+{% endblock %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+{% for field, errors in form.errors.items() %}
+    <ul class="errors">
+        {% for error in errors %}
+        <li>{{field}}: {{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+<a href="{{url_for('product.index')}}"><b>Go Back</b></a><br><br>
+<div class="flex flex-between-center">
+    <div class="">
+        {% for role in current_user.roles if role.name == 'admin' %}
+        <button class="button success" onclick="openModal()">Create</button>
+        
+        <div class="modal-container" id="create_product">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <div class="form-container full_width">
+                    <h3>Create Product</h3>
+
+
+                    <form method="POST" action="{{url_for('product.create_product')}}">
+                        {{ form.hidden_tag() }}
+                        <div>
+                            {{ form.name.label }} {{ form.name() }}
+                        </div>
+                        <div>
+                            {{ form.barcode.label }} {{ form.barcode() }}
+                        </div>
+                        <div class="flex flex-evenly-center" style="margin-bottom:10px;">
+                            {{ form.safety_quantity_custom.label }} {{ form.safety_quantity_custom() }}
+                        </div>
+                        <div class="">
+                            {{ form.safety_quantity.label }} {{ form.safety_quantity(value=-1,disabled=True) }}
+                        </div>
+                        <div>
+                            {{ form.status.label }}
+                            <select name="status" id="status">
+                                {% for choice_key, choice_label in form.status.choices %}
+                                {% if choice_key == "NotAvailable" %}
+                                <option value="{{ choice_key }}" selected>{{ choice_label }}</option>
+                                {% else %}
+                                <option value="{{ choice_key }}">{{ choice_label }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            {{ form.categories.label }} {{ form.categories() }}
+                        </div>
+                        <button type="submit" class="button success">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="">
+        <form action="{{url_for("product.search_product")}}" method="get" class="flex flex-start-center">
+            <input type="text" id="" name="query" placeholder="Search..." style="margin: 0 10px 0 0;">
+            <button class="button gray" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<div class="table-container " style="max-height:750px; overflow-y: scroll;">
+
+    <table class="">
+        
+        <tr>
+            <th>Bar Code</th>
+            <th>Name</th>
+            <th>Categories</th>
+            <th>Safety Line </th>
+            <th>Status </th>
+            <th>Action</th>
+        </tr>
+    
+    
+        {% for product in products %}
+        <tr>
+
+            <td>
+                <span><a href="{{url_for('product.get_product',id = product.id)}}">{{ product.BarCode}}</a></span>
+                {{ form.barcode(style="display:none", value=product.BarCode) }}
+            </td>
+            <td>
+                <span><a href="{{url_for('product.get_product',id = product.id)}}">{{ product.Name
+                        }}</a></span>
+
+                {{ form.name(style="display:none", value=product.Name) }}
+            </td>
+            <td>
+                {{display_categories(product)}}
+            </td>
+            <td>
+                <span>{{ product.Safety_quantity }}</span>
+                {{ form.safety_quantity(style="display:none", value=product.Safety_quantity) }}
+            </td>
+            <td>
+                <span>{{ product.Status }}</span>
+            </td>
+
+            <td>
+                <button type="button" class="button info" id="edit" href="javascript:;"><i
+                        class='bx bx-edit'></i></button>
+                <button type="submit" class="button success" id="update" onclick="changeFormAction(this)"
+                    style="display: none;"><i class='bx bx-check'></i></button>
+                <button type="button" class="button info" id="cancel" href="javascript:;"
+                    style="display: none;"><i class='bx bx-x'></i></button>
+
+                {% for role in current_user.roles if role.name == 'admin' %}
+                <form method="GET" action="{{ url_for('product.delete_product', id=product.id) }}"
+                    style="display: inline-block;">
+                    {{ form.hidden_tag() }}
+                    <button id="delete" class="button error" type="submit"
+                        onclick="return confirm('Are you sure you want to delete this item? Product will be deleted along with the inventories! ')"><i
+                            class='bx bx-trash-alt'></i></button>
+                </form>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    
+</table>
+</div>
+
+{% endblock %}
+
+{% block jscontent %}
+<script>
+    var chk_autoid = document.getElementById('safety_quantity_custom')
+
+    chk_autoid.addEventListener('change', () => {
+        var field_id = document.getElementById('safety_quantity')
+        if (chk_autoid.checked)
+            field_id.disabled = false
+        else
+            field_id.disabled = true
+    })
+</script>
+
+
+<script src={{url_for('static',filename='/js/tablefield_editable.js')}}></script>
+
+
+<script src="{{url_for('static',filename='/js/modal.js')}}"></script>
+{% endblock %}
+
+
+
+
+{% macro display_categories(product) %}
+<span>
+    {% for category in product.Categories %}
+    <a href="{{url_for('product.products_by_category',category_name = category.Name)}}"
+        style="text-decoration: none; color: #dd5b5b">
+        {{ category.Name }}
+    </a>
+    |
+    {% endfor %}
+</span>
+{% endmacro %}

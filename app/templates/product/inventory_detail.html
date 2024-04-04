@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block nav_title %} Products Overview > <a href="{{url_for('product.get_product',id = inventory.Product_id )}}">Product</a> > <a href="{{url_for('product.inventory_detail',id=inventory.id)}}">Inventory Detail</a>{% endblock %}
+
+{% block css_style %}
+
+<link rel="stylesheet" href="{{url_for('static',filename='css/flex.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/table.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}">
+<link rel="stylesheet" href="{{url_for('static',filename='css/card.css')}}">
+<style>
+    .card{
+        justify-content: normal !important;
+    }
+</style>
+{% endblock %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+<a href="{{url_for('product.get_product',id = inventory.Product_id )}}"><b>Go Back</b></a><br><br>
+
+<div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+
+<div class="grid-container four-two-grid">
+    <div class="grid-item">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="flex flex-between-center">
+                    <h3 style="margin: 0;">Detail</h3>
+                    {% for role in current_user.roles if role.name == 'admin' %}<a href="{{url_for('product.delete_inventory',id = inventory.id)}}" style="color: red;"  onclick="return confirm('Are you sure to delete this inventory?')">Delete Inventory</a>{% endfor %}
+                </div>
+            </div>
+            <div class="card-contents">
+                <br>
+                <div class="">
+                    
+                    <p>StockIn ({{inventory.StockInDate}}) </p><br>
+                    <p>Expire Date ({{inventory.ExpiryDate}})</p><br>
+                    <p>Init_QTY ({{inventory.Init_QTY}})  |  Available_QTY ({{inventory.Available_QTY}})  |  Locked_QTY ({{inventory.Locked_QTY}})  |  Lost_QTY ({{inventory.Lost_QTY}})  |  Sold_QTY ({{inventory.Sold_QTY}})</p><br>
+                    <p>Cost: <b style="text-decoration: underline;">RM {{"%.2f"|format(inventory.CostPerItem)}}</b>/Item</p><br>
+                    <p>Sales Price: <b style="text-decoration: underline;">RM {{"%.2f"|format(inventory.RetailPrice)}}</b></p><br>
+                    <p>Supplier: {% for su in suppliers %}
+                        {% if su.id == inventory.Supplier_id %}
+                            {{su.Name}} 
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                    <br>
+                </div>
+                <div class="">
+                    <h3 style="text-align: center;">Lost Report</h3>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Particular</th>
+                            <th>QTY</th>
+                            <th>Remark</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for re in lost_reports %}
+                        <tr>
+                            <td>{{re.date}}</td>
+                            <td>{{re.particulars}}</td>
+                            <td>{{re.qty_lost}}</td>
+                            <td>{{re.remark}}</td>
+                            <td><a href="{{url_for('product.undo_items',id =re.id)}}" onclick="return confirm('Do you want to perform undo?')"><i class='bx bx-undo' style="font-size:1.2rem"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="grid-item">
+
+    
+    <div class="card">
+        <div class="card-header">
+            
+            <div class="flex flex-between-center">
+                <h3 id="switch-text" style="margin: 0;">Edit Form</h3>
+                <i class='bx bx-transfer' id="switch-btn" style="cursor: pointer;"></i>
+            </div>
+        </div>
+        <div class="card-contents">
+            <form action="{{url_for('product.edit_inventory',id=inventory.id)}}" id="edit-form" method="post">
+                <select name="supplier" id="supplier" required>
+                    {% for su in suppliers %}
+                    <option value="{{su.id}}" {% if su.id == inventory.Supplier_id %} selected {% endif %}>{{su.Name}}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="date">StockIn Date</label>
+                <input type="date" name="new_stockin" id="" value="{{inventory.StockInDate}}" required>
+                <label for="date">Expiry Date</label>
+                <input type="date" name="new_expiry" id=""  value="{{inventory.ExpiryDate}}" required>
+                
+                <label for="costperitem">Cost Per Item</label>
+                <input type="number" name="costperitem"  value="{{inventory.CostPerItem}}" min="0.00" step="0.01" required>    
+                <label for="particulars">Sales Price</label>
+                <input type="number" placeholder="sales price" name="retailprice"  value="{{inventory.RetailPrice}}" min="0.00" step="0.01" required>
+
+                <label for="init_QTY">Init QTY</label>
+                <input type="number" placeholder="" name="init_qty"  value="{{inventory.Init_QTY}}" min="0.00" step="0.01" required>
+                <label for="Available_QTY">Available QTY</label>
+                <input type="number" placeholder="" name="available_qty" value="{{inventory.Available_QTY}}" min="0.00" step="0.01" required>
+                <label for="Locked_QTY">Locked QTY (Editing is not recommended)</label>
+                <input type="number" placeholder="" name="locked_qty"value="{{inventory.Locked_QTY}}" min="0.00" step="0.01" required>
+                <label for="Sold_QTY">Sold QTY</label>
+                <input type="number" placeholder="" name="sold_qty" value="{{inventory.Sold_QTY}}" min="0.00" step="0.01" required>
+                <label for="Lost_QTY">Lost QTY</label>
+                <input type="number" placeholder="" name="lost_qty" value="{{inventory.Lost_QTY}}" min="0.00" step="0.01" required>
+                
+                <input type="submit" value="Edit" onclick="return confirm('Are you sure to edit this inventory?')">
+            </form>
+
+            <form action="{{url_for('product.create_lost_report',i = inventory.id)}}"  id="report-form" method="post" style="display: none;">
+                <label for="particular">Particular</label>
+                <select name="particular" id="particular">
+                    <option value="Items Lost">Items Lost</option>
+                    <option value="Items Expired">Items Expired</option>
+                    <option value="Items Damaged">Items Damaged</option>
+                    <option value="Other">Other (Please fill in the remarks)</option>
+                </select>
+                <!-- <label for="choice_inventory">Inventory</label>
+                <select name="Inventory" id="">
+                    <option value="1">Inventory 1 (StockIn: 2024-24-22) RM:2.5</option>
+                </select> -->
+                <label for="qty">qty</label>
+                <input type="number" name="lost_qty" id="" value="0" min="0" step="1" required>
+                <label for="remark">Remark</label>
+                <textarea name="remark" id="" rows="10" required></textarea>
+                <input type="submit" value="Submit">
+            </form>
+
+            
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block jscontent %}
+
+<script>
+
+    // document.getElementById('date').valueAsDate = new Date();
+
+    document.getElementById('switch-btn').addEventListener('click',()=>{
+        var addform = document.getElementById('edit-form')
+        var insertform = document.getElementById('report-form')
+        var title = document.getElementById('switch-text')
+
+        if (insertform.style.display === "none") {
+            insertform.style.display = "block";
+            addform.style.display = "none";
+            title.innerText = "Report Form"
+        } else {
+            insertform.style.display = "none";
+            addform.style.display = "block";
+            title.innerText = "Edit Form"
+        }
+    })
+</script>
+
+{% endblock %}

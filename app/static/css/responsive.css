@@ -1,0 +1,84 @@
+/* Extra Small (XS) */
+@media (max-width: 550px) {
+/* CSS styles for Extra Small screens */
+    aside{
+        width: 0;
+        position: absolute;
+    }
+    aside.opened{
+        position: absolute;
+        --sidebar-width:100%;
+    }
+    .brand-items{
+        padding: 5px 0;
+    }
+    .mobile.menu-burger{
+        display: block;
+    }
+
+    .main{
+        width: 100%;
+    }
+
+}
+
+/* Small (S) */
+/* @media (min-width: 576px) and (max-width: 767px) { */
+@media (min-width: 550px) and (max-width: 767px) {
+/* CSS styles for Small screens */
+:root{
+    --sidebar-width:0;
+}
+    aside{
+        width: var(--sidebar-width);
+        position: absolute;
+    }
+    
+    aside.opened{
+        position: absolute;
+        --sidebar-width:40%;
+    }
+    .brand-items{
+        padding: 5px 0;
+    }
+    .mobile.menu-burger{
+        display: block;
+        font-size: 1.4rem;
+    }
+
+    .main{
+        width: 100%;
+        transition: none;
+    }
+
+}
+
+/* Medium (M) */
+@media (min-width: 768px) and (max-width: 991px) {
+/* CSS styles for Medium screens */
+    aside.opened{
+        /* position: absolute; */
+        --sidebar-width:24%;
+    }
+    .brand-items{
+        padding: 5px 0;
+    }
+
+}
+
+/* Large (L) */
+@media (min-width: 992px) and (max-width: 1199px) {
+/* CSS styles for Large screens */
+    aside.opened{
+        /* position: absolute; */
+        --sidebar-width:22%;
+    }
+    .brand-items{
+        padding: 5px 0;
+    }
+}
+
+/* Extra Large (XL) */
+@media (min-width: 1200px) {
+/* CSS styles for Extra Large screens */
+}

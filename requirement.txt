@@ -1,0 +1,14 @@
+Flask == 3.0.0
+Flask-SQLAlchemy == 3.1.1
+SQLAlchemy == 2.0.25
+
+pandas == 2.1.4
+openpyxl == 3.1.2
+Flask-WTF == 1.2.1
+WTForms == 3.1.2
+email_validator
+plotly == 5.18.0
+fpdf2==2.7.8
+Flask-Principal==0.4.0
+Markdown==3.6
+beautifulsoup4==4.12.3

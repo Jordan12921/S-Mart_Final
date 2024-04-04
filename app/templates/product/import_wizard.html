@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+
+    
+    
+
+        <h1 style="text-align: center;">{% block title %} The Inventory Page {% endblock %}</h1>
+
+        <a href="{{url_for('stock.create_stock')}}" class="" >Add New</a> <br>
+        <form action="{{url_for('stock.excel_upload')}}" method="post" enctype="multipart/form-data">
+            <input type = "file" name = "file"  />
+            <input type="submit" value="IMPORT" name="upload_excel">
+            <br><br>
+        </form>
+        <style>
+            th,td{
+                padding: .5rem 1rem;
+            }
+        </style>
+    {% if info_message %}
+    <p>
+        {{info_message}}
+    </p>
+    {% endif %}
+        <br><br>
+    <div class="" id="preview">
+        <h3>Preview</h3>
+        <form action="{{url_for('stock.validate_exceldata')}}" method="post">
+
+            <table border="1" name="data_table" style="font-size: 0.65rem;">
+                <thead>
+                    <tr>
+                        {% for col in column_names %}
+                        <th>
+                            <span>{{col}}</span>
+                            <input type="text" style="display: none;"   name="column_names" value="{{col}}" required>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for index, row in row_data.iterrows() %}
+                    <tr 
+                        {% if first_duplicate_rows.bool %}
+                            {% if index in first_duplicate_rows.index %} 
+                                style="background-color: rgb(182, 255, 195)"
+                            {% elif index in repeated_rows.index %}
+                                style="background-color: rgba(255, 182, 193, 1)"
+                            {% endif %} 
+                        {% endif %}
+                     >
+                        {% for col, row_ in zip(column_names, row) %}
+                        
+                        <td
+                            {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                            {% set row_ = " " %}   
+                            style="background: rgba(255,0,0,0.4);"
+                            {% endif %}
+                        >
+                            <span name="" >
+                                {% if row_data[col].dtype == 'datetime64[ns]' %}
+                                    {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                                        {{row_}}
+                                    
+                                    {% else %}
+                                        {{row_.strftime('%Y-%m-%d')}}
+                                    {% endif %}
+                                {% else %}
+                                    {{row_}}   
+                                {% endif %}
+                            </span>
+                            
+                            <input style="display: none;" name="{{col}}" id="" 
+                                {% if row_data[col].dtype == 'int64' %}
+                                    type="number" min="0.000000000000000" step="0.0000000000000001" value="{{row_}}"
+                                {% elif row_data[col].dtype == 'float64' %}
+                                    type="number" min="0.000000000000000" step="0.0000000000000001" value="{{row_}}"
+                                {% elif row_data[col].dtype == 'datetime64[ns]' %}
+                                    {% if (pd.isnull(row_)) or pd.isna(row[col]) or row_ == "nan" %}
+                                        type="date" value=""
+                                    {% else %}
+                                        type="date" value="{{row_.strftime('%Y-%m-%d')}}"
+                                    {% endif %}
+                                {% else %}
+                                    type="text" value="{{row_}}"
+                                {% endif %}
+                            required>
+                        </td>
+                        {% endfor %}
+                        {% if not proceed %}
+                        <td>
+                            <a id="edit" href="javascript:;">edit</a>
+                            <a id="update" href="javascript:;" name="" style="display: none;">Update</a>
+                            <a id="cancel" href="javascript:;" style="display: none;">Cancel</a>
+                            <a id="delete" href="javascript:;">delete</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" name="form_step_validation">Perform validation</button>
+  
+            
+            <!-- <button {% if not repeated_rows.empty %} onclick="return confirm('Data Contains duplicate rows, are you sure to keep it in records?')" {% endif %}>  Next</button> -->
+            
+        </form>
+    </div>
+
+    <br><br>
+    <div class="">
+        <h3></h3>
+        <form action="{{url_for('stock.final_validate')}}" method="post">
+
+            <label for="choose_table">Choose Table: </label>
+            <!-- <select name="choose_table" id="" required>
+                <option value="">Select Table</option>
+                <option value="Table 1">Table 1</option>
+                <option value="Table 2">Table 2</option>
+                <option value="Table 3">Table 3</option>
+            </select> -->
+            <button type="submit" name="DB_validation">CHECK</button>
+        </form>
+    </div>
+    <br><br>
+
+    {% if not import_method == "" or not import_method is none %}
+    <div class="form_step3">
+        <span>Replace Columns Name</span>
+        <input type="checkbox" name="chk_replace" value="option1" checked disabled>
+        {% if import_method == "smart" %}
+            <h3>Smart Import</h3>
+            <form action="{{url_for('stock.insert_toDB')}}" method="post">                
+                <button type="submit">INSERT</button>
+            </form>
+
+        {% elif import_method == "advance" %}
+            <h3>Custom/Advance Import</h3>
+            <form action="{{url_for('stock.insert_toDB')}}" method="post">
+
+                {% for type in column_types %}
+                <label for="">Column ({{type}}):</label>
+                <select name="column_index" id="" required>
+                    <option value=>Select Column</option>
+                    {% for column in column_names %}
+                    <option value={{column}}>{{column}}</option>
+                    {% endfor %}
+                </select><br>
+                {% endfor %}
+                <button type="submit">Validate & INSERT</button>
+            </form>
+
+        {% elif import_method == "failure" %}
+            <p>Sorry, the import failed this time</p>
+        {% endif %}
+    </div>
+    {% endif %}
+ 
+
+
+
+
+
+
+
+
+    <!-- JavaScript -->
+    <script>
+        var btnEdits = document.querySelectorAll('#edit');
+        var btnCancels = document.querySelectorAll('#cancel');
+        var btnUpdate = document.querySelectorAll('#update');
+        var btnDelete = document.querySelectorAll('#delete');
+
+        btnEdits.forEach((btnEdit)=>{
+            btnEdit.addEventListener('click',editable);
+        });
+        
+        btnCancels.forEach((btnCancel)=>{
+            btnCancel.addEventListener('click',editable)
+        });
+
+        btnUpdate.forEach((btnUpdate)=>{
+            var row = btnUpdate.closest('tr');
+            var inputElements = row.querySelectorAll('input:not([type=radio])');
+
+            btnUpdate.addEventListener('click',()=>{
+                inputElements.forEach((inputElement) => {
+                    var closestSpan = inputElement.parentElement.querySelector('span');
+                    var nearbySpan = inputElement.previousElementSibling; //get sibling element of the input: span
+                    // Update the span text with the input value
+                    if (nearbySpan && inputElement.value) {nearbySpan.textContent = inputElement.value;}
+                    inputElement.value = inputElement.value.trim();
+                });  
+            });
+            btnUpdate.addEventListener('click',editable)
+        })
+
+        btnDelete.forEach((btnDelete)=>{
+            var row = btnDelete.closest('tr');
+            btnDelete.addEventListener('click',()=>{
+
+                row.remove();
+            })
+        })
+
+        
+        function editable(event) {
+            var row = event.target.closest('tr');
+            var inputElements = row.querySelectorAll('input:not([type=radio])');
+            var spanElements = row.querySelectorAll('span');
+
+            inputElements.forEach((inputElement) => {
+                inputElement.style.display = (inputElement.style.display === 'none') ? 'inline-block' : 'none';
+            });
+            spanElements.forEach((spanElement) => {
+                spanElement.style.display = (spanElement.style.display === 'none') ? 'inline-block' : 'none';
+            });
+             // Toggle the display of the edit, update, and cancel links
+            row.querySelector('#edit').style.display = (row.querySelector('#edit').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#update').style.display = (row.querySelector('#update').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#cancel').style.display = (row.querySelector('#cancel').style.display === 'none') ? 'inline-block' : 'none';
+            row.querySelector('#delete').style.display = (row.querySelector('#delete').style.display === 'none') ? 'inline-block' : 'none';
+        }
+
+    </script>
+{% endblock %}

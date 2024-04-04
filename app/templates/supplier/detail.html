@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block nav_title %} Supplier Overview > <a href="{{url_for('supplier.get_supplier',id = supplier.id)}}">Supplier</a>{% endblock %}
+{% block css_style %}
+    <link rel="stylesheet" href="{{url_for('static',filename='css/grid.css')}}"> 
+    <link rel="stylesheet" href="{{url_for('static',filename='css/form.css')}}"> 
+{% endblock %}
+{% block nav_inventory %}active{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h3>Edit Supplier</h3>
+
+    <form method="POST" action="{{ url_for('supplier.update_supplier',id = supplier.id) }}">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" value="{{ supplier.Name if supplier else '' }}" required><br><br>
+        
+        <label for="contact">Contact:</label><br>
+        <input type="text" id="contact" name="contact" value="{{ supplier.Contact if supplier else '' }}" required><br><br>
+        
+        <label for="address">Address:</label><br>
+        <input type="text" id="address" name="address" value="{{ supplier.Address if supplier else '' }}" required><br><br>
+        
+        <label for="comment">Comment:</label><br>
+        <textarea id="comment" name="comment" cols="4" required>{{ supplier.Comment if supplier else '' }}</textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+{% endblock %}
