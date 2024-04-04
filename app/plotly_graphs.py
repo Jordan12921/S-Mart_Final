@@ -134,7 +134,8 @@ def show_inventory_turnover_graph():
     )
     turnover_bar_figure.update_layout(
         barmode='group', title='Sales, Inventory, and Inventory Turnover',
-        xaxis=dict(title='Product')
+        xaxis=dict(title='Product'),
+        plot_bgcolor="#fff"
         # yaxis=dict(title='TurnoverRate')
     )
     turnover_bar_figure.add_trace(go.Scatter(

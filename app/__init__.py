@@ -276,14 +276,18 @@ def all_Model_value_total():
     # Calculate total monthly profit
     current_month = datetime.now().month
     current_year = datetime.now().year
-    total_monthly_profit = db.session.query(db.func.sum(Sale.Total - (Sale_Item.Quantity * Inventory.CostPerItem))) \
-        .join(Sale_Item).join(Inventory).filter(db.func.extract('year', Sale.Date) == current_year, db.func.extract('month', Sale.Date) == current_month).scalar()
+    # total_monthly_profit = db.session.query(db.func.sum(Sale.Total - (Sale_Item.Quantity * Inventory.CostPerItem))) \
+    #     .join(Sale_Item).join(Inventory).filter(db.func.extract('year', Sale.Date) == current_year, db.func.extract('month', Sale.Date) == current_month).scalar()
+    total_monthly_profit = db.session.query(db.func.sum(Sale.Total)).filter(db.func.extract('year', Sale.Date) == current_year, db.func.extract('month', Sale.Date) == current_month).scalar()
+
+
     # Calculate daily sales and daily profit
     today = date.today()
     total_daily_sales = Sale.query.filter_by(Date=today).count()
-    total_daily_profit = db.session.query(db.func.sum(Sale.Total - (Sale_Item.Quantity * Inventory.CostPerItem))) \
-        .join(Sale_Item).join(Inventory).filter(Sale.Date == today).scalar()
+    # total_daily_profit = db.session.query(db.func.sum(Sale.Total - (Sale_Item.Quantity * Inventory.CostPerItem))) \
+    #     .join(Sale_Item).join(Inventory).filter(Sale.Date == today).scalar()
     
+    total_daily_profit = db.session.query(db.func.sum(Sale.Total)).filter(Sale.Date == today).scalar()
     
 
     # Create plotly visualization for products by status
